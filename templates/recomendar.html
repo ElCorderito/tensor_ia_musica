@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recomendaciones de Música</title>
+</head>
+<body>
+    <h1>Recomendaciones de Música</h1>
+
+    <a href="{% url 'index' %}" class="btn btn-primary mx-2">Index</a>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="nombre_cancion">Introduce el nombre de la canción:</label>
+        <input type="text" id="nombre_cancion" name="nombre_cancion">
+        <button type="submit">Buscar</button>
+    </form>
+    
+    {% if recomendaciones %}
+        <h2>Recomendaciones:</h2>
+        <ul>
+            {% for cancion in recomendaciones %}
+                <li>
+                    Nombre: {{ cancion.track_name }},
+                    Artista: {{ cancion.artists }},
+                    Álbum: {{ cancion.album_name }},
+                    Género: {{ cancion.track_genre }},
+                    Popularidad: {{ cancion.popularity }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

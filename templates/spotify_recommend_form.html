@@ -1,0 +1,16 @@
+<!-- templates/spotify_recommend_form.html -->
+<form method="POST">
+    {% csrf_token %}
+    <label for="track_id">Introduce el ID de la canción de Spotify:</label>
+    <input type="text" id="track_id" name="track_id" placeholder="Ejemplo: 6rqhFgbbKwnb9MLmUQDhG6">
+    <button type="submit">Obtener Recomendaciones</button>
+</form>
+
+<a href="{% url 'index' %}" class="btn btn-primary mx-2">Index</a>
+
+<h2>Recomendaciones:</h2>
+<ul>
+    {% for recommendation in recommendations %}
+        <li>{{ recommendation.name }} - {{ recommendation.artists.0.name }}</li>
+    {% endfor %}
+</ul>

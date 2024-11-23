@@ -1,0 +1,61 @@
+<!-- templates/tensoria.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recomendaciones con TensorFlow</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Recomendaciones de Canciones con TensorFlow</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="nombre_cancion" class="form-label">Nombre de la Canción</label>
+                <input type="text" class="form-control" id="nombre_cancion" name="nombre_cancion" value="{{ nombre_cancion }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="artista_cancion" class="form-label">Artista</label>
+                <input type="text" class="form-control" id="artista_cancion" name="artista_cancion" value="{{ artista_cancion }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="album_cancion" class="form-label">Álbum</label>
+                <input type="text" class="form-control" id="album_cancion" name="album_cancion" value="{{ album_cancion }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Obtener Recomendaciones</button>
+        </form>
+
+        {% if recomendaciones %}
+            <h2 class="mt-5">Recomendaciones:</h2>
+            <div class="row">
+                {% for rec in recomendaciones %}
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ rec.track_name }}</h5>
+                                <p class="card-text">
+                                    Artista: {{ rec.artists }}<br>
+                                    Álbum: {{ rec.album_name }}<br>
+                                    Géneros: {{ rec.track_genre }}
+                                </p>
+                                {% if rec.preview_url %}
+                                    <audio controls>
+                                        <source src="{{ rec.preview_url }}" type="audio/mpeg">
+                                        Tu navegador no soporta la reproducción de audio.
+                                    </audio>
+                                {% else %}
+                                    <p>No hay preview disponible.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% elif mensaje_error %}
+            <div class="alert alert-danger mt-4">{{ mensaje_error }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
