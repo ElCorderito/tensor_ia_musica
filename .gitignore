@@ -1,0 +1,111 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+env/
+venv/
+dj_py310/
+entorno_ia/
+backend/env/
+backend/venv/
+backend/dj_py310/
+backend/entorno_ia/
+
+# Archivos de entorno
+.env
+.env.*
+backend/.env
+backend/.env.*
+
+# Archivos de base de datos
+*.sqlite3
+*.db
+backend/*.sqlite3
+backend/*.db
+
+# Archivos de log
+*.log
+backend/*.log
+
+# Archivos temporales y de caché
+*.tmp
+.cache/
+backend/*.tmp
+backend/.cache/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+backend/.DS_Store
+backend/Thumbs.db
+
+# Migraciones de Django (opcional)
+*/migrations/
+backend/*/migrations/
+
+# Archivos grandes o generados
+static/otros/*.csv
+static/otros/*.pkl
+static/otros/*.h5
+static/otros/*.npy
+backend/static/otros/*.csv
+backend/static/otros/*.pkl
+backend/static/otros/*.h5
+backend/static/otros/*.npy
+
+# Archivos de distribución (Python)
+dist/
+build/
+backend/dist/
+backend/build/
+
+# Scripts locales
+*.bat
+backend/*.bat
+
+# Archivos de reporte de errores
+error.log
+backend/error.log
+
+# Archivos de configuración de IDEs (si aplican)
+.vscode/
+.idea/
+backend/.vscode/
+backend/.idea/
+
+# === Nuevas reglas para el proyecto Angular (frontend) ===
+
+# Dependencias de Node.js
+frontend/node_modules/
+
+# Archivos generados
+frontend/dist/
+frontend/tmp/
+frontend/out-tsc/
+
+# Archivos de paquetes y logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+# Si deseas versionar package-lock.json, comenta la siguiente línea:
+frontend/package-lock.json
+
+# Archivos de ambiente
+frontend/.env
+frontend/.env.*
+
+# Archivos de pruebas y cobertura
+frontend/coverage/
+frontend/.nyc_output/
+
+# Archivos de configuración de IDEs en el frontend
+frontend/.vscode/
+frontend/.idea/
+
+# Archivos temporales del sistema
+frontend/.DS_Store
+frontend/Thumbs.db
+
+# === Fin de las nuevas reglas para el proyecto Angular ===
