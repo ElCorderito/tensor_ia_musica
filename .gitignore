@@ -31,12 +31,6 @@ Thumbs.db
 # Migraciones de Django (opcional)
 */migrations/
 
-# Archivos grandes o generados
-static/otros/*.csv
-static/otros/*.pkl
-static/otros/*.h5
-static/otros/*.npy
-
 # Archivos de distribución
 dist/
 build/

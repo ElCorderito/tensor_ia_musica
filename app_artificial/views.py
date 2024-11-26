@@ -13,6 +13,11 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .ai_scripts.recommender import recomendar_canciones
 from django.urls import reverse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import RecomendacionSerializer
+import json
 
 load_dotenv()
 df = pd.read_csv('static/otros/dataset.csv')
@@ -168,3 +173,35 @@ def tensoria_view(request):
         'album_cancion': album_cancion,
         'mensaje_error': mensaje_error
     })
+
+class RecomendacionAPIView(APIView):
+    def post(self, request):
+        nombre_cancion = request.data.get('nombre_cancion')
+        artista_cancion = request.data.get('artista_cancion')
+        album_cancion = request.data.get('album_cancion')
+
+        recomendaciones_df = recomendar_canciones(
+            nombre_cancion, artista_cancion, album_cancion, df_grouped, latent_representations
+        )
+
+        if recomendaciones_df is not None and not recomendaciones_df.empty:
+            recomendaciones = recomendaciones_df.to_dict(orient='records')
+
+            # Obtener preview_url de Spotify para cada recomendación
+            token_info = refresh_token_if_needed(request)
+            if token_info is None:
+                return Response({'error': 'No autenticado en Spotify'}, status=status.HTTP_401_UNAUTHORIZED)
+            sp = Spotify(auth=token_info['access_token'])
+            for rec in recomendaciones:
+                query = f"track:{rec['track_name']} artist:{rec['artists']}"
+                results = sp.search(q=query, type='track', limit=1)
+                if results['tracks']['items']:
+                    track = results['tracks']['items'][0]
+                    rec['preview_url'] = track.get('preview_url')
+                else:
+                    rec['preview_url'] = None
+
+            serializer = RecomendacionSerializer(recomendaciones, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'No se encontraron recomendaciones.'}, status=status.HTTP_404_NOT_FOUND)

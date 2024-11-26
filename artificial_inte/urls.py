@@ -12,4 +12,5 @@ urlpatterns = [
     path('spotify_login/', views.spotify_login, name='spotify_login'),  # Inicio de sesión de Spotify
     path('callback/', views.spotify_callback, name='spotify_callback'),  # Callback de Spotify
     path('tensoria/', views.tensoria_view, name='tensoria'),  # Recomendaciones del Tensorflow
+    path('api/recomendaciones/', RecomendacionAPIView.as_view(), name='api_recomendaciones'),  # API de recomendaciones
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
