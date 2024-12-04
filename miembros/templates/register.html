@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Medolify</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #191414;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .register-container {
+            background-color: #121212;
+            padding: 40px;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .register-container h1 {
+            color: #1DB954;
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .register-input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #333;
+            background-color: #333;
+            color: white;
+            font-size: 16px;
+        }
+        .register-input:focus {
+            outline: none;
+            border: 1px solid #1DB954;
+        }
+        .register-button,
+        .back-button {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .register-button {
+            background-color: #1DB954;
+            color: white;
+        }
+        .register-button:hover {
+            background-color: #1ed760;
+        }
+        .back-button {
+            background-color: #555;
+            color: white;
+            margin-top: 15px;
+        }
+        .back-button:hover {
+            background-color: #444;
+        }
+        .login-text {
+            color: #b3b3b3;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-text a {
+            color: #1DB954;
+            text-decoration: none;
+        }
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+        /* Estilos para mensajes de error */
+        .errorlist {
+            color: #ff4d4d;
+            list-style-type: none;
+            padding: 0;
+            margin: 0 0 10px 0;
+        }
+        .errorlist li {
+            margin: 0;
+        }
+        /* Ocultar labels por defecto */
+        label {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>Medolify</h1>
+        <!-- Formulario de Registro -->
+        <form method="POST" action="{% url 'register_user' %}">
+            {% csrf_token %}
+            <!-- Renderizamos manualmente los campos para aplicar clases CSS -->
+            {% if form.non_field_errors %}
+                <ul class="errorlist">{{ form.non_field_errors }}</ul>
+            {% endif %}
+            <div>
+                {% for field in form %}
+                    {% if field.errors %}
+                        <ul class="errorlist">{{ field.errors }}</ul>
+                    {% endif %}
+                    {{ field }}
+                {% endfor %}
+            </div>
+            <button type="submit" class="register-button">Registrarse</button>
+        </form>
+        <!-- Enlace a Login -->
+        <div class="login-text">
+            <p>¿Ya tienes una cuenta? <a href="{% url 'login_user' %}">Inicia sesión aquí</a></p>
+        </div>
+        <!-- Botón para regresar al inicio -->
+        <form action="{% url 'index' %}" method="get">
+            <button type="submit" class="back-button">Regresar al inicio</button>
+        </form>
+    </div>
+</body>
+</html>

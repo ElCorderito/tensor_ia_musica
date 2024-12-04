@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'app_artificial',
     "rest_framework",
     "corsheaders",
+    "miembros",
 ]
 
 MIDDLEWARE = [
@@ -41,6 +42,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
+
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',

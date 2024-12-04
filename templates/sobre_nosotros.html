@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
+    <title>Historial</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <style>
         /* Estilos generales */
@@ -15,6 +15,7 @@
             display: flex;
             flex-direction: column;
         }
+
         /* Contenedor principal */
         .container {
             max-width: 800px;
@@ -109,11 +110,30 @@
             flex-wrap: wrap;
         }
 
-        /* Footer */
+        /* Cambiar color del botón cuando está expandido */
+        .accordion-button:not(.collapsed) {
+            background-color: #1ba34b !important; /* Verde claro */
+            color: white !important; /* Texto blanco */
+        }
+    
+        /* Cambiar el color del borde y la sombra del botón */
+        .accordion-button:not(.collapsed)::after {
+            background-image: none !important; /* Remueve la flecha predeterminada */
+        }
+    
+        /* Asegurarse de que los bordes y texto mantengan consistencia */
+        .accordion-button {
+            border: 1px solid #1DB954; /* Verde Spotify */
+        }
+    
+        .accordion-button.collapsed {
+            background-color: white; /* Fondo para el botón colapsado */
+            color: #000; /* Texto negro */
+        }
+
         .footer {
             background-color: #f1f1f1;
-            color: #000;
-            padding: 20px 0;
+            padding: 20px;
             text-align: center;
         }
     </style>
@@ -159,53 +179,9 @@
         </div>
     </nav>
 
-
-    <!-- Sección de Bienvenida -->
-    <div class="hero-section text-center">
-        <div class="container">
-            <h1 class="display-4">Bienvenido a Medolify</h1>
-            <p class="lead">Seleccione una de las opciones para continuar:</p>
-
-            <div class="d-flex justify-content-center mt-4 flex-wrap">
-                <!-- Botón para iniciar sesión en Spotify -->
-                <a href="{% url 'spotify_login' %}" class="boton-elegante mx-2 mb-2">Iniciar sesión en Spotify</a>
-
-                
-                <a href="{% url 'tensoria' %}" class="boton-elegante mx-2 mb-2">Recomendaciones con TensorFlow</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tarjetas de Información -->
-    <div class="container">
-        <div class="card-deck">
-            <div class="card">
-                <a href="https://www.spotify.com" target="_blank">
-                    <img src="https://th.bing.com/th/id/OIP.9tLdW9g_HLCvCz0UIioKZQHaFj?rs=1&pid=ImgDetMain" class="card-img-top" alt="Imagen 2">
-                    <div class="card-body">
-                        <h5 class="card-title">Spotify</h5>
-                        <p class="card-text">Recomendaciones inteligentes por Spotify para mejorar tu experiencia musical.</p>
-                    </div>
-                </a>
-            </div>
-            <div class="card">
-                <a href="https://www.tensorflow.org" target="_blank">
-                    <img src="https://training.digigrowhub.in/wp-content/uploads/2022/12/TensorFlow_logo.svg_.png" class="card-img-top" alt="Imagen 3">
-                    <div class="card-body">
-                        <h5 class="card-title">TensorFlow</h5>
-                        <p class="card-text">Utiliza TensorFlow para obtener recomendaciones aún más precisas.</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-
     <!-- Pie de página -->
     <footer class="footer">
         <p>&copy; 2024 Medolify. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
-</html>

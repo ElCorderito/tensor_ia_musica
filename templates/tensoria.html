@@ -1,61 +1,375 @@
-<!-- templates/tensoria.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recomendaciones con TensorFlow</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1>Recomendaciones de Canciones con TensorFlow</h1>
+    <style>
+        /* Estilos generales */
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
 
+        /* Contenedor principal */
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+            flex: 1; /* Hace que el contenedor principal se expanda para empujar el footer hacia abajo */
+        }
+
+        /* Navbar */
+        .navbar {
+            margin-bottom: 30px;
+        }
+
+        /* Títulos y textos */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #000;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-size: 1.1rem;
+            color: #000;
+        }
+
+        /* Formulario */
+        .form-control {
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        /* Botón elegante */
+        .boton-elegante {
+            padding: 15px 30px;
+            border: 2px solid #2c2c2c;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.4s ease;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            font-weight: bold;
+            display: inline-block;
+            min-width: 200px;
+            text-align: center;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .boton-elegante::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: scale(0);
+            transition: transform 0.5s ease;
+        }
+
+        .boton-elegante:hover::after {
+            transform: scale(4);
+        }
+
+        .boton-elegante:hover {
+            border-color: #666666;
+            background: #292929;
+        }
+
+        /* Tarjetas */
+        .card {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-width: 300px;
+            min-height: 350px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        .card-body {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        /* Contenedor de las tarjetas */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .col-md-4 {
+            flex: 1 1 30%;
+            margin: 10px;
+        }
+
+        /* Audio player */
+        .audio-player {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Mensaje de error */
+        .alert-danger {
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #f1f1f1;
+            color: #000;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        /* Estilos para el dropdown de sugerencias */
+        #suggestions {
+            position: absolute;
+            z-index: 1000;
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-top: none;
+            max-height: 250px; /* Limita la altura a aproximadamente 5 elementos */
+            overflow-y: auto; /* Agrega scrollbar vertical si es necesario */
+        }
+
+        #suggestions .list-group-item {
+            cursor: pointer;
+        }
+
+        #suggestions .list-group-item:hover {
+            background-color: #f0f0f0;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'index' %}">Medolify</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Enlaces comunes -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'sobre_nosotros' %}">Sobre nosotros</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contactos</a>
+                    </li>
+                    <!-- Mostrar enlaces según el estado de autenticación -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'historial' %}">Historial</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout_user' %}">Cerrar Sesión</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login_user' %}">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register_user' %}">Registrarse</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Recomendaciones de Canciones con TensorFlow</h1>
+        <!-- Formulario para ingresar la canción -->
         <form method="post">
             {% csrf_token %}
-            <div class="mb-3">
+            <div class="mb-3 position-relative">
                 <label for="nombre_cancion" class="form-label">Nombre de la Canción</label>
-                <input type="text" class="form-control" id="nombre_cancion" name="nombre_cancion" value="{{ nombre_cancion }}" required>
+                <input type="text" class="form-control" id="nombre_cancion" name="nombre_cancion"
+                       value="{{ nombre_cancion }}" required autocomplete="off">
+                <!-- Dropdown para las sugerencias -->
+                <div id="suggestions" class="list-group position-absolute w-100"></div>
             </div>
-            <div class="mb-3">
-                <label for="artista_cancion" class="form-label">Artista</label>
-                <input type="text" class="form-control" id="artista_cancion" name="artista_cancion" value="{{ artista_cancion }}" required>
-            </div>
-            <div class="mb-3">
-                <label for="album_cancion" class="form-label">Álbum</label>
-                <input type="text" class="form-control" id="album_cancion" name="album_cancion" value="{{ album_cancion }}" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Obtener Recomendaciones</button>
+            
+            <!-- Campos ocultos para artista y álbum -->
+            <input type="hidden" id="artista_cancion" name="artista_cancion" value="{{ artista_cancion }}">
+            <input type="hidden" id="album_cancion" name="album_cancion" value="{{ album_cancion }}">
+            <button type="submit" class="boton-elegante">Obtener Recomendaciones</button>
         </form>
 
+        <!-- Sección de recomendaciones -->
         {% if recomendaciones %}
-            <h2 class="mt-5">Recomendaciones:</h2>
-            <div class="row">
-                {% for rec in recomendaciones %}
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ rec.track_name }}</h5>
-                                <p class="card-text">
-                                    Artista: {{ rec.artists }}<br>
-                                    Álbum: {{ rec.album_name }}<br>
-                                    Géneros: {{ rec.track_genre }}
-                                </p>
-                                {% if rec.preview_url %}
-                                    <audio controls>
-                                        <source src="{{ rec.preview_url }}" type="audio/mpeg">
-                                        Tu navegador no soporta la reproducción de audio.
-                                    </audio>
-                                {% else %}
-                                    <p>No hay preview disponible.</p>
-                                {% endif %}
-                            </div>
-                        </div>
+        <h2 class="mt-5 text-center">Recomendaciones:</h2>
+        <div class="row">
+            {% for rec in recomendaciones %}
+            <div class="col-md-4">
+                <div class="card">
+                    {% if rec.album_cover_url %}
+                    <img src="{{ rec.album_cover_url }}" class="card-img-top" alt="{{ rec.album_name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/200" class="card-img-top" alt="Sin imagen disponible">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ rec.track_name }}</h5>
+                        <p class="card-text">
+                            Artista: {{ rec.artists }}<br>
+                            Álbum: {{ rec.album_name }}<br>
+                            Géneros: {{ rec.track_genre }}
+                        </p>
+                        {% if rec.preview_url %}
+                        <audio controls class="audio-player">
+                            <source src="{{ rec.preview_url }}" type="audio/mpeg">
+                            Tu navegador no soporta la reproducción de audio.
+                        </audio>
+                        {% else %}
+                        <p>No hay preview disponible.</p>
+                        {% endif %}
                     </div>
-                {% endfor %}
+                </div>
             </div>
+            {% endfor %}
+        </div>
         {% elif mensaje_error %}
-            <div class="alert alert-danger mt-4">{{ mensaje_error }}</div>
+        <div class="alert alert-danger mt-4">{{ mensaje_error }}</div>
         {% endif %}
     </div>
+
+    <!-- Pie de página -->
+    <footer class="footer">
+        <p>&copy; 2024 Medolify. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('#nombre_cancion').on('input', function() {
+            var query = $(this).val();
+            if (query.length >= 2) {
+                $.ajax({
+                    url: '{% url "autocomplete_songs" %}',
+                    data: {
+                        'term': query
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        $('#suggestions').empty();
+                        if (data.length > 0) {
+                            data.forEach(function(item) {
+                                var suggestion = $('<a href="#" class="list-group-item list-group-item-action"></a>');
+                                // Construir el texto de la sugerencia incluyendo los géneros
+                                suggestion.html('<strong>' + item.track_name + '</strong><br>' +
+                                                'Artista: ' + item.artists + '<br>' +
+                                                'Álbum: ' + item.album_name + '<br>' +
+                                                'Géneros: ' + item.track_genre.replace(/,/g, ', '));
+                                suggestion.data('track_name', item.track_name);
+                                suggestion.data('artists', item.artists);
+                                suggestion.data('album_name', item.album_name);
+                                $('#suggestions').append(suggestion);
+                            });
+                            // Limitar la altura del dropdown para mostrar 5 elementos y agregar scrollbar
+                            $('#suggestions').css({
+                                'max-height': '250px', // Ajusta según la altura de tus elementos
+                                'overflow-y': 'auto'
+                            });
+                            $('#suggestions').show();
+                        } else {
+                            $('#suggestions').hide();
+                        }
+                    }
+                });
+            } else {
+                $('#suggestions').empty().hide();
+            }
+        });
+    
+        // Manejar la selección de una sugerencia
+        $('#suggestions').on('click', 'a', function(e) {
+            e.preventDefault();
+            var track_name = $(this).data('track_name');
+            var artists = $(this).data('artists');
+            var album_name = $(this).data('album_name');
+    
+            $('#nombre_cancion').val(track_name);
+            $('#artista_cancion').val(artists);
+            $('#album_cancion').val(album_name);
+    
+            $('#suggestions').empty().hide();
+        });
+    
+        // Ocultar las sugerencias cuando el usuario hace clic fuera
+        $(document).click(function(e) {
+            if (!$(e.target).closest('#nombre_cancion, #suggestions').length) {
+                $('#suggestions').empty().hide();
+            }
+        });
+    });
+    </script>
+    
+
 </body>
+
 </html>
