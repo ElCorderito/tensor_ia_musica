@@ -2,26 +2,16 @@
 
 ![Inicio sesión](static/imagens/ia_sesion.png)
 
-![Inicio](static/imagens/ia_registrar.png)
+![Registrar](static/imagens/ia_registrar.png)
 
-![Inicio](static/imagens/ia_recomendacion_uno.png)
+![Recomendaciones uno](static/imagens/ia_recomendacion_uno.png)
 
-![Inicio](static/imagens/ia_inicio.png)
+![Recomendaciones dos](static/imagens/ia_recomendacion_dos.png)
 
-![Inicio](static/imagens/ia_inicio.png)
+![Recomendaciones tres](static/imagens/ia_recomendacion_tres.png)
 
-![Inicio](static/imagens/ia_inicio.png)
+![Historial uno](static/imagens/ia_historial.png)
 
-![Inicio](static/imagens/ia_inicio.png)
+![Historial dos](static/imagens/ia_historial_dos.png)
 
-![Inicio](static/imagens/ia_inicio.png)
-
-![Inicio](static/imagens/ia_inicio.png)
-
-![Inicio](static/imagens/ia_inicio.png)
-
-![Inicio](static/imagens/ia_inicio.png)
-
-![Inicio](static/imagens/ia_inicio.png)
-
-![Inicio](static/imagens/ia_inicio.png)
+![Historial tres](static/imagens/ia_historial_tres.png)
