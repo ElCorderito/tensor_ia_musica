@@ -14,6 +14,7 @@
             font-family: 'Arial', sans-serif;
             display: flex;
             flex-direction: column;
+            padding-top: 40px;
         }
 
         /* Contenedor principal */
@@ -197,15 +198,30 @@
             background-color: #f0f0f0;
         }
 
+        /* Cambiar el color del "glow" de los switches a verde */
+        .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+    
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.5);
+        }
+    
+        /* Cambiar el color del texto de las etiquetas */
+        .form-check-label {
+            color: #000;
+        }
 
     </style>
 </head>
 
 <body>
     <!-- Barra de navegación -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'index' %}">Medolify</a>
+            <a class="navbar-brand" href="{% url 'index' %}">Melodify</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav" aria-controls="navbarNav"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -218,7 +234,7 @@
                         <a class="nav-link" href="{% url 'sobre_nosotros' %}">Sobre nosotros</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contactos</a>
+                        <a class="nav-link" href="{% url 'tensoria' %}">Recomendador</a>
                     </li>
                     <!-- Mostrar enlaces según el estado de autenticación -->
                     {% if user.is_authenticated %}
@@ -249,7 +265,7 @@
             <div class="mb-3 position-relative">
                 <label for="nombre_cancion" class="form-label">Nombre de la Canción</label>
                 <input type="text" class="form-control" id="nombre_cancion" name="nombre_cancion"
-                       value="{{ nombre_cancion }}" required autocomplete="off">
+                    value="{{ nombre_cancion }}" required autocomplete="off">
                 <!-- Dropdown para las sugerencias -->
                 <div id="suggestions" class="list-group position-absolute w-100"></div>
             </div>
@@ -257,6 +273,42 @@
             <!-- Campos ocultos para artista y álbum -->
             <input type="hidden" id="artista_cancion" name="artista_cancion" value="{{ artista_cancion }}">
             <input type="hidden" id="album_cancion" name="album_cancion" value="{{ album_cancion }}">
+            
+            <!-- Controles para ajustar los filtros -->
+            <h3>Ajustar filtros:</h3>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="filter_danceability" name="filter_danceability" {% if request.POST.filter_danceability or filter_danceability %}checked{% endif %}>
+                <label class="form-check-label" for="filter_danceability">
+                    Priorizar Danceability
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="filter_energy" name="filter_energy" {% if request.POST.filter_energy or filter_energy %}checked{% endif %}>
+                <label class="form-check-label" for="filter_energy">
+                    Priorizar Energy
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="filter_valence" name="filter_valence" {% if request.POST.filter_valence or filter_valence %}checked{% endif %}>
+                <label class="form-check-label" for="filter_valence">
+                    Priorizar Valence
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="filter_tempo" name="filter_tempo" {% if request.POST.filter_tempo or filter_tempo %}checked{% endif %}>
+                <label class="form-check-label" for="filter_tempo">
+                    Priorizar Tempo
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="filter_track_genre" name="filter_track_genre" {% if request.POST.filter_track_genre or filter_track_genre %}checked{% endif %}>
+                <label class="form-check-label" for="filter_track_genre">
+                    Priorizar Género
+                </label>
+            </div>
+
+
+            
             <button type="submit" class="boton-elegante">Obtener Recomendaciones</button>
         </form>
 
@@ -299,7 +351,7 @@
 
     <!-- Pie de página -->
     <footer class="footer">
-        <p>&copy; 2024 Medolify. Todos los derechos reservados.</p>
+        <p>&copy; 2024 Melodify. Todos los derechos reservados.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

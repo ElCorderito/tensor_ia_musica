@@ -8,9 +8,15 @@ class HistorialBusqueda(models.Model):
     artista_cancion = models.CharField(max_length=255)
     album_cancion = models.CharField(max_length=255)
     fecha_busqueda = models.DateTimeField(auto_now_add=True)
+    # Añadir campos para los filtros
+    filter_danceability = models.BooleanField(default=False)
+    filter_energy = models.BooleanField(default=False)
+    filter_valence = models.BooleanField(default=False)
+    filter_tempo = models.BooleanField(default=False)
+    filter_track_genre = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.nombre_cancion} - {self.artista_cancion}"
+        return f"{self.nombre_cancion} - {self.artista_cancion} ({self.fecha_busqueda.strftime('%d/%m/%Y %H:%M')})"
 
 class Recomendacion(models.Model):
     historial = models.ForeignKey(HistorialBusqueda, on_delete=models.CASCADE, related_name='recomendaciones')

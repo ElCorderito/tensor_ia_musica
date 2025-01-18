@@ -14,6 +14,7 @@
             font-family: 'Arial', sans-serif;
             display: flex;
             flex-direction: column;
+            padding-top: 40px;
         }
 
         /* Contenedor principal */
@@ -141,9 +142,10 @@
 
 <body>
     <!-- Barra de Navegación -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'index' %}">Medolify</a>
+            <a class="navbar-brand" href="{% url 'index' %}">Melodify</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav" aria-controls="navbarNav"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -156,7 +158,7 @@
                         <a class="nav-link" href="{% url 'sobre_nosotros' %}">Sobre nosotros</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contactos</a>
+                        <a class="nav-link" href="{% url 'tensoria' %}">Recomendador</a>
                     </li>
                     <!-- Mostrar enlaces según el estado de autenticación -->
                     {% if user.is_authenticated %}
@@ -192,29 +194,57 @@
                             </button>
                         </h2>
                         <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#historialAccordion">
-                            <div class="accordion-body">
-                                {% if item.recomendaciones.all %}
-                                    <h5>Recomendaciones:</h5>
-                                    <ul class="list-group">
-                                        {% for rec in item.recomendaciones.all %}
-                                            <li class="list-group-item">
-                                                <strong>{{ rec.track_name }}</strong> - {{ rec.artists }}
+                        <!-- ... tu código existente ... -->
+
+                        <div class="accordion-body">
+                            <p><strong>Filtros utilizados:</strong>
+                            {% if item.filter_danceability or item.filter_energy or item.filter_valence or item.filter_tempo or item.filter_track_genre %}
+                                <ul>
+                                    {% if item.filter_danceability %}
+                                        <li>Danceability</li>
+                                    {% endif %}
+                                    {% if item.filter_energy %}
+                                        <li>Energy</li>
+                                    {% endif %}
+                                    {% if item.filter_valence %}
+                                        <li>Valence</li>
+                                    {% endif %}
+                                    {% if item.filter_tempo %}
+                                        <li>Tempo</li>
+                                    {% endif %}
+                                    {% if item.filter_track_genre %}
+                                        <li>Género</li>
+                                    {% endif %}
+                                </ul>
+                            {% else %}
+                                Sin filtros
+                            {% endif %}
+                            </p>
+                            {% if item.recomendaciones.all %}
+                                <h5>Recomendaciones:</h5>
+                                <ul class="list-group">
+                                    {% for rec in item.recomendaciones.all %}
+                                        <li class="list-group-item">
+                                            <strong>{{ rec.track_name }}</strong> - {{ rec.artists }}
+                                            <br>
+                                            Álbum: {{ rec.album_name }}
+                                            {% if rec.preview_url %}
                                                 <br>
-                                                Álbum: {{ rec.album_name }}
-                                                {% if rec.preview_url %}
-                                                    <br>
-                                                    <audio controls>
-                                                        <source src="{{ rec.preview_url }}" type="audio/mpeg">
-                                                        Tu navegador no soporta la reproducción de audio.
-                                                    </audio>
-                                                {% endif %}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                {% else %}
-                                    <p>No hay recomendaciones disponibles.</p>
-                                {% endif %}
-                            </div>
+                                                <audio controls>
+                                                    <source src="{{ rec.preview_url }}" type="audio/mpeg">
+                                                    Tu navegador no soporta la reproducción de audio.
+                                                </audio>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No hay recomendaciones disponibles.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- ... tu código existente ... -->
+
                         </div>
                     </div>
                 {% endfor %}
@@ -226,7 +256,7 @@
 
     <!-- Pie de página -->
     <footer class="footer">
-        <p>&copy; 2024 Medolify. Todos los derechos reservados.</p>
+        <p>&copy; 2024 Melodify. Todos los derechos reservados.</p>
     </footer>
 
     <!-- Incluye Bootstrap JS versión 5.1.3 -->

@@ -157,10 +157,29 @@ def refresh_token_if_needed(request):
 def tensoria_view(request):
     recomendaciones = None
     mensaje_error = None
-    if request.method == 'POST':
-        nombre_cancion = request.POST.get('nombre_cancion', '').strip()
-        artista_cancion = request.POST.get('artista_cancion', '').strip()
-        album_cancion = request.POST.get('album_cancion', '').strip()
+
+    if request.method == 'POST' or ('nombre_cancion' in request.session):
+        if request.method == 'POST':
+            nombre_cancion = request.POST.get('nombre_cancion', '').strip()
+            artista_cancion = request.POST.get('artista_cancion', '').strip()
+            album_cancion = request.POST.get('album_cancion', '').strip()
+            # Obtener los filtros
+            filter_danceability = request.POST.get('filter_danceability')
+            filter_energy = request.POST.get('filter_energy')
+            filter_valence = request.POST.get('filter_valence')
+            filter_tempo = request.POST.get('filter_tempo')
+            filter_track_genre = request.POST.get('filter_track_genre')
+        else:
+            # Recuperar datos del formulario de la sesión
+            nombre_cancion = request.session.pop('nombre_cancion', '').strip()
+            artista_cancion = request.session.pop('artista_cancion', '').strip()
+            album_cancion = request.session.pop('album_cancion', '').strip()
+            # Recuperar filtros
+            filter_danceability = request.session.pop('filter_danceability', None)
+            filter_energy = request.session.pop('filter_energy', None)
+            filter_valence = request.session.pop('filter_valence', None)
+            filter_tempo = request.session.pop('filter_tempo', None)
+            filter_track_genre = request.session.pop('filter_track_genre', None)
 
         if not artista_cancion or not album_cancion:
             # Buscar en el DataFrame agrupado
@@ -178,63 +197,99 @@ def tensoria_view(request):
                     'mensaje_error': mensaje_error
                 })
 
-        # Llamar a la función recomendar_canciones con los datos proporcionados
+        # Pesos por defecto
+        default_weights = {
+            'popularity': 1.0,
+            'duration_ms': 0.4,
+            'danceability': 1.7,
+            'energy': 1.7,
+            'key': 0.8,
+            'loudness': 1.0,
+            'mode': 1.0,
+            'speechiness': 1.0,
+            'acousticness': 1.3,
+            'instrumentalness': 1.2,
+            'liveness': 1.0,
+            'valence': 1.7,
+            'tempo': 1.3,
+            'time_signature': 0.3,
+            'track_genre': 1.8
+        }
+
+        # Manejar los filtros seleccionados
+        if (filter_danceability or filter_energy or filter_valence or filter_tempo or filter_track_genre):
+            # Usuario seleccionó filtros
+            user_weights = {feature: 0.0 for feature in default_weights.keys()}
+            if filter_danceability:
+                user_weights['danceability'] = default_weights['danceability']
+            if filter_energy:
+                user_weights['energy'] = default_weights['energy']
+            if filter_valence:
+                user_weights['valence'] = default_weights['valence']
+            if filter_tempo:
+                user_weights['tempo'] = default_weights['tempo']
+            if filter_track_genre:
+                user_weights['track_genre'] = default_weights['track_genre']
+        else:
+            # Sin filtros, usar pesos por defecto
+            user_weights = default_weights
+
+        # Llamar a la función recomendar_canciones
         recomendaciones_df = recomendar_canciones(
-            nombre_cancion, artista_cancion, album_cancion, df_grouped, latent_representations
+            nombre_cancion, artista_cancion, album_cancion, df_grouped, user_weights
         )
 
-        # Verificar si se obtuvieron recomendaciones
         if recomendaciones_df is not None and not recomendaciones_df.empty:
             recomendaciones = recomendaciones_df.to_dict(orient='records')
 
-            # Para cada recomendación, obtener el preview_url usando la API de Spotify
+            # Obtener preview_url y album_cover_url
             token_info = refresh_token_if_needed(request)
             if token_info is None:
                 # Almacenar datos del formulario en la sesión
                 request.session['nombre_cancion'] = nombre_cancion
                 request.session['artista_cancion'] = artista_cancion
                 request.session['album_cancion'] = album_cancion
+                # Almacenar filtros
+                if filter_danceability:
+                    request.session['filter_danceability'] = True
+                if filter_energy:
+                    request.session['filter_energy'] = True
+                if filter_valence:
+                    request.session['filter_valence'] = True
+                if filter_tempo:
+                    request.session['filter_tempo'] = True
+                if filter_track_genre:
+                    request.session['filter_track_genre'] = True
                 login_url = f"{reverse('spotify_login')}?next={request.path}"
                 return redirect(login_url)
 
-            sp = Spotify(auth=token_info['access_token'])
-            for rec in recomendaciones:
-                # Verificar que las claves existen
-                track_name = rec.get('track_name') or rec.get('track_name_column_name')
-                artist_name = rec.get('artists') or rec.get('artist_name_column_name')
+            else:
+                sp = Spotify(auth=token_info['access_token'])
+                for rec in recomendaciones:
+                    track_name = rec.get('track_name')
+                    artist_name = rec.get('artists')
 
-                # Asegurarse de que los campos track_name y artist_name estén definidos
-                if not track_name or not artist_name:
-                    rec['preview_url'] = None
-                    rec['album_cover_url'] = None
-                    continue
-
-                # Construir la consulta para Spotify
-                query = f"track:{track_name} artist:{artist_name}"
-                try:
-                    results = sp.search(q=query, type='track', limit=1)
-
-                    # Verificar si se encontraron resultados
-                    if results['tracks']['items']:
-                        track = results['tracks']['items'][0]
-
-                        # Manejar el preview_url
-                        rec['preview_url'] = track.get('preview_url')
-
-                        # Manejar la URL de la imagen del álbum
-                        rec['album_cover_url'] = (
-                            track['album']['images'][0]['url'] if track['album']['images'] else None
-                        )
-                    else:
-                        # Si no se encuentran resultados
+                    if not track_name or not artist_name:
                         rec['preview_url'] = None
                         rec['album_cover_url'] = None
+                        continue
 
-                except Exception as e:
-                    # Manejo de errores al buscar en Spotify
-                    print(f"Error al buscar en Spotify: {e}")
-                    rec['preview_url'] = None
-                    rec['album_cover_url'] = None
+                    query = f"track:{track_name} artist:{artist_name}"
+                    try:
+                        results = sp.search(q=query, type='track', limit=1)
+                        if results['tracks']['items']:
+                            track = results['tracks']['items'][0]
+                            rec['preview_url'] = track.get('preview_url')
+                            rec['album_cover_url'] = (
+                                track['album']['images'][0]['url'] if track['album']['images'] else None
+                            )
+                        else:
+                            rec['preview_url'] = None
+                            rec['album_cover_url'] = None
+                    except Exception as e:
+                        print(f"Error al buscar en Spotify: {e}")
+                        rec['preview_url'] = None
+                        rec['album_cover_url'] = None
 
             # Guardar en el historial si el usuario está autenticado
             if request.user.is_authenticated:
@@ -242,33 +297,28 @@ def tensoria_view(request):
                     usuario=request.user,
                     nombre_cancion=nombre_cancion,
                     artista_cancion=artista_cancion,
-                    album_cancion=album_cancion
+                    album_cancion=album_cancion,
+                    filter_danceability=bool(filter_danceability),
+                    filter_energy=bool(filter_energy),
+                    filter_valence=bool(filter_valence),
+                    filter_tempo=bool(filter_tempo),
+                    filter_track_genre=bool(filter_track_genre)
                 )
 
-                # Guardar cada recomendación en el modelo Recomendacion
+                # Guardar recomendaciones
                 recomendacion_objects = []
                 for rec in recomendaciones:
-                    # Obtener datos de la recomendación
-                    track_name = rec.get('track_name') or rec.get('track_name_column_name')
-                    artist_name = rec.get('artists') or rec.get('artist_name_column_name')
-                    album_name = rec.get('album_name')
-                    track_genre = rec.get('track_genre')
-                    preview_url = rec.get('preview_url')
-                    album_cover_url = rec.get('album_cover_url')
-
-                    # Crear instancia de Recomendacion
                     recomendacion = Recomendacion(
                         historial=historial_entry,
-                        track_name=track_name,
-                        artists=artist_name,
-                        album_name=album_name,
-                        track_genre=track_genre,
-                        preview_url=preview_url,
-                        album_cover_url=album_cover_url
+                        track_name=rec.get('track_name'),
+                        artists=rec.get('artists'),
+                        album_name=rec.get('album_name'),
+                        track_genre=rec.get('track_genre'),
+                        preview_url=rec.get('preview_url'),
+                        album_cover_url=rec.get('album_cover_url')
                     )
                     recomendacion_objects.append(recomendacion)
 
-                # Guardar todas las recomendaciones de una vez
                 Recomendacion.objects.bulk_create(recomendacion_objects)
 
         else:
@@ -277,14 +327,25 @@ def tensoria_view(request):
         nombre_cancion = ''
         artista_cancion = ''
         album_cancion = ''
+        filter_danceability = None
+        filter_energy = None
+        filter_valence = None
+        filter_tempo = None
+        filter_track_genre = None
 
     return render(request, 'tensoria.html', {
         'recomendaciones': recomendaciones,
         'nombre_cancion': nombre_cancion,
         'artista_cancion': artista_cancion,
         'album_cancion': album_cancion,
-        'mensaje_error': mensaje_error
+        'mensaje_error': mensaje_error,
+        'filter_danceability': filter_danceability,
+        'filter_energy': filter_energy,
+        'filter_valence': filter_valence,
+        'filter_tempo': filter_tempo,
+        'filter_track_genre': filter_track_genre
     })
+
 
 @require_GET
 def autocomplete_songs(request):

@@ -14,6 +14,7 @@
             font-family: 'Arial', sans-serif;
             display: flex;
             flex-direction: column;
+            padding-top: 40px;
         }
 
         /* Contenedor principal */
@@ -141,9 +142,10 @@
 
 <body>
     <!-- Barra de Navegación -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'index' %}">Medolify</a>
+            <a class="navbar-brand" href="{% url 'index' %}">Melodify</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav" aria-controls="navbarNav"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -156,7 +158,7 @@
                         <a class="nav-link" href="{% url 'sobre_nosotros' %}">Sobre nosotros</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contactos</a>
+                        <a class="nav-link" href="{% url 'tensoria' %}">Recomendador</a>
                     </li>
                     <!-- Mostrar enlaces según el estado de autenticación -->
                     {% if user.is_authenticated %}
@@ -179,9 +181,36 @@
         </div>
     </nav>
 
+        <!-- Sección de Bienvenida -->
+        <div class="hero-section text-center">
+            <div class="container">
+                <h1 class="display-4">Sobre Nosotros</h1>
+                <p class="lead">Estudiantes del Instituto Tecnológico de Tijuana, participantes en la materia de Inteligencia Artificial, impartida por el profesor Arnulfo Alanís Garza.
+                </p>
+                <p class="lead">Escalante Ponce José Arturo
+                </p>
+                <p class="lead">
+                    Gallardo Dueñas Eduardo
+                </p>
+                <p class="lead">
+     
+                    García Cordero Emiliano
+                </p>
+                <p class="lead">
+
+                    García Cruz Rodolfo Jair
+
+                </p>
+                <p class="lead">
+
+                    Gutiérrez Martínez Ana Cristina
+                </p>
+            </div>
+        </div>
+
     <!-- Pie de página -->
     <footer class="footer">
-        <p>&copy; 2024 Medolify. Todos los derechos reservados.</p>
+        <p>&copy; 2024 Melodify. Todos los derechos reservados.</p>
     </footer>
 
 </body>
